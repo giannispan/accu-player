@@ -24,7 +24,7 @@ class FileService {
 
     // Remove file
     static removeFile(file) {
-        return axios.delete(`${url}files/${file}`);
+        return axios.delete(`${url}file/${file}`);
     }
 }
 

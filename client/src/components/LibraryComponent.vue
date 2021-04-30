@@ -36,7 +36,17 @@
     </form>
     <hr>
     <div class="content">
-        <h1 class="title">My audio list</h1>
+      <h1 class="title">My audio list</h1>
+      <div class="panel list-group">
+          <span class="sound-item" v-for="(file,index) in files" :key="index">
+            <a>
+              <span class="mr-2"><i class="fas fa-play"></i></span>{{file.name}}
+            </a>
+            <button :disabled="files.length == 1" class="button is-danger is-small delete-button ml-6" @click="deleteFile(file.name)">
+              <span class="fa fa-trash"></span>
+            </button>
+          </span>
+      </div>
     </div>
   </div>
 </template>
@@ -72,9 +82,40 @@ export default {
           }, 2000);
         })
     },
+    deleteFile(file) {
+      // prevent from empty list
+      if (this.files.length == 1) {
+        return
+      }
+      FileService.removeFile(file)
+        .then(() => {
+          return FileService.getFiles();
+        })
+        .then(response => {
+          this.files = response.data;
+        })
+        .catch(err => {
+          this.error = err.response.data.message;
+          this.file = undefined;
+
+          // Hide error message after 2 seconds
+          setTimeout(() => {
+            this.error = '';
+          }, 2000);
+        })
+    },
     selectFile() {
       this.file = this.$refs.file.files[0];
     } 
+  },
+  mounted() {
+    FileService.getFiles()
+      .then(response => {
+        this.files = response.data;
+      })
+      .catch(err => {
+        console.log(err)
+      })
   },
   
 }
@@ -101,5 +142,15 @@ export default {
     background-color: #ffc5c1;
     padding:  10px;
     margin-bottom: 15px;
+  }
+  .sound-item {
+    display: table;
+    margin: auto;
+    width: 450px;
+    padding: 10px;
+  }
+  .delete-button {
+    float: right;
+    position: relative;
   }
 </style>
