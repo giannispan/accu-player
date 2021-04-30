@@ -1,7 +1,7 @@
 const uploadFile = require('../middleware/upload');
 const fs = require('fs');
 
-const upload = async (req,res) => {
+const upload = async (req, res) => {
     try {
         await uploadFile(req, res);
 
@@ -23,13 +23,13 @@ const upload = async (req,res) => {
     }
 }
 
-const getListFiles = (req,res) => {
+const getListFiles = (req, res) => {
 
     const directoryPath = __basedir + "/resources/static/assets/uploads/";
 
     fs.readdir(directoryPath, (err, files) => {
         if (err) {
-            res.status(500).send({
+            return res.status(500).send({
                 message: 'Unable to find files!'
             })
         }
@@ -45,7 +45,27 @@ const getListFiles = (req,res) => {
     });
 }
 
+const remove = (req, res) => {
+
+    const filename = req.params.name;
+    const directoryPath = __basedir + "/resources/static/assets/uploads/";
+
+    fs.unlink(directoryPath + filename, (err) => {
+        if (err) {
+            return res.status(500).send({
+                message: 'Cound not remove the file.' + err
+            });
+        }
+
+        res.status(200).send({
+            message: 'File deleted successfully'
+        });
+    });
+
+}
+
 module.exports = {
     upload,
-    getListFiles
+    getListFiles,
+    remove
 }
