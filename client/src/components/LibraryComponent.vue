@@ -37,12 +37,21 @@
     <hr>
     <div class="content">
       <h1 class="title">My audio list</h1>
+      <div class="columns">
+        <div id="waveform" class="column is-four-fifths"></div>
+        <div class="column">
+          <button @click.prevent="playPause()" class="button is-primary is-small">
+            <span v-show="isPlaying"><i class="fas fa-pause"></i>Pause</span>
+            <span v-show="!isPlaying"><i class="fas fa-play"></i>Play</span>
+          </button>
+        </div>
+      </div>
       <div class="panel list-group">
           <span class="sound-item" v-for="(file,index) in files" :key="index">
-            <a>
-              <span class="mr-2"><i class="fas fa-play"></i></span>{{file.name}}
+            <a @click.prevent="loadSound(file)">
+              {{file}}
             </a>
-            <button :disabled="files.length == 1" class="button is-danger is-small delete-button ml-6" @click="deleteFile(file.name)">
+            <button :disabled="files.length == 1" class="button is-danger is-small delete-button ml-6" @click="deleteFile(file)">
               <span class="fa fa-trash"></span>
             </button>
           </span>
@@ -53,14 +62,16 @@
 
 <script>
 import FileService from '../FileService';
+import WaveSurfer from 'wavesurfer.js';
 
 export default {
   name: 'LibraryComponent',
   data() {
     return {
       files: [],
-      file: '',
-      error: ''
+      file: undefined,
+      error: '',
+      wavesurfer: null
     }
   },
   methods: {
@@ -81,6 +92,7 @@ export default {
             this.error = '';
           }, 2000);
         })
+        this.file = undefined;
     },
     deleteFile(file) {
       // prevent from empty list
@@ -95,6 +107,7 @@ export default {
           this.files = response.data;
         })
         .catch(err => {
+          console.log(err)
           this.error = err.response.data.message;
           this.file = undefined;
 
@@ -106,12 +119,37 @@ export default {
     },
     selectFile() {
       this.file = this.$refs.file.files[0];
-    } 
+    },
+    createWaveSurfer() {
+      this.wavesurfer = WaveSurfer.create({
+        container: "#waveform",
+        hideScrollbar: true,
+        barWidth: 1,
+        waveColor: "#00d1b2",
+        fillParent: true
+      })
+    },
+    playPause() {
+      this.wavesurfer.playPause();
+    },
+    loadSound(sound) {
+      if (sound && this.wavesurfer) {
+        this.wavesurfer.load(require('../../../server/resources/static/assets/uploads/' + sound));
+      }
+    }
+  },
+  computed: {
+    isPlaying() {
+      return this.wavesurfer && this.wavesurfer.isPlaying();
+    }
   },
   mounted() {
+    if (!this.wavesurfer) this.createWaveSurfer();
     FileService.getFiles()
       .then(response => {
         this.files = response.data;
+        // Always load the first track in list
+        this.wavesurfer.load(require('../../../server/resources/static/assets/uploads/' + this.files[0]));
       })
       .catch(err => {
         console.log(err)
