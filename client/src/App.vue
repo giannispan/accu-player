@@ -1,18 +1,18 @@
 <template>
   <div class="section">
     <div class="container">
-      <UploadComponent />
+      <LibraryComponent />
     </div>
   </div>
 </template>
 
 <script>
-import UploadComponent from './components/UploadComponent.vue'
+import LibraryComponent from './components/LibraryComponent.vue'
 
 export default {
   name: 'App',
   components: {
-    UploadComponent
+    LibraryComponent
   }
 }
 </script>
