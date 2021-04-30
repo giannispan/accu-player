@@ -1,5 +1,5 @@
 const uploadFile = require('../middleware/upload');
-const fs = require('fs');
+const { promises: fs } = require('fs');
 
 const upload = async (req, res) => {
     try {
@@ -12,9 +12,15 @@ const upload = async (req, res) => {
             message: 'Uploaded file successfully:' + req.file.originalname
         });
     } catch (error) {
+        console.log(error)
         if (error.code == 'LIMIT_FILE_SIZE') {
             return res.status(400).send({
                 message: 'File size cannot be larger than 10MB'
+            })
+        }
+        if (error.code == 'FILE_TYPE') {
+            return res.status(400).send({
+                message: error.message
             })
         }
         res.status(500).send({
@@ -23,44 +29,36 @@ const upload = async (req, res) => {
     }
 }
 
-const getListFiles = (req, res) => {
+const getListFiles = async (req, res) => {
 
     const directoryPath = __basedir + "/resources/static/assets/uploads/";
-
-    fs.readdir(directoryPath, (err, files) => {
-        if (err) {
-            return res.status(500).send({
-                message: 'Unable to find files!'
-            })
-        }
-
-        let fileInfos = [];
-
-        files.forEach((file) => {
-            fileInfos.push({
-                name: file
-            });
-        });
+    try {
+        const fileInfos = await fs.readdir(directoryPath);
         res.status(200).send(fileInfos);
-    });
+    } catch (err) {
+        return res.status(500).send({
+            message: 'Unable to find files!'
+        });
+    }
 }
 
-const remove = (req, res) => {
+// const getListFilesH
+
+const remove = async (req, res) => {
 
     const filename = req.params.name;
     const directoryPath = __basedir + "/resources/static/assets/uploads/";
 
-    fs.unlink(directoryPath + filename, (err) => {
-        if (err) {
-            return res.status(500).send({
-                message: 'Cound not remove the file.' + err
-            });
-        }
-
+    try {
+        await fs.unlink(directoryPath + filename);
         res.status(200).send({
             message: 'File deleted successfully'
         });
-    });
+    } catch (error) {
+        return res.status(500).send({
+            message: 'Cound not remove the file.' + error
+        });
+    }
 
 }
 

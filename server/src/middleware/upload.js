@@ -34,7 +34,7 @@ let checkFileType = function checkFileType(file, cb) {
     if(mimetype && extname){
         return cb(null,true);
     } else {
-        cb('Only audio files!');
+        cb({code: 'FILE_TYPE', message: 'Only audio files!'});
     }
 }
 
