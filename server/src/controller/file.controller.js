@@ -23,6 +23,29 @@ const upload = async (req,res) => {
     }
 }
 
+const getListFiles = (req,res) => {
+
+    const directoryPath = __basedir + "/resources/static/assets/uploads/";
+
+    fs.readdir(directoryPath, (err, files) => {
+        if (err) {
+            res.status(500).send({
+                message: 'Unable to find files!'
+            })
+        }
+
+        let fileInfos = [];
+
+        files.forEach((file) => {
+            fileInfos.push({
+                name: file
+            });
+        });
+        res.status(200).send(fileInfos);
+    });
+}
+
 module.exports = {
-    upload
+    upload,
+    getListFiles
 }
