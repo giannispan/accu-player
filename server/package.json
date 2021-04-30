@@ -1,0 +1,26 @@
+{
+  "name": "accu-player",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/giannispan/accu-player.git"
+  },
+  "author": "giannis",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/giannispan/accu-player/issues"
+  },
+  "homepage": "https://github.com/giannispan/accu-player#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "multer": "^1.4.2",
+    "nodemon": "^2.0.7"
+  }
+}
